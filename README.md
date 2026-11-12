@@ -172,6 +172,41 @@ export SPRING_DATASOURCE_PASSWORD=library_pass
 ./mvnw spring-boot:run
 ```
 
+### Pre-Seeded Sample Data (`V2__seed_sample_data.sql`)
+
+On startup, Flyway automatically seeds the database with sample borrowers, books (including multiple copies of the same ISBN), and loan records using fixed UUIDs so you can test every endpoint immediately:
+
+#### Pre-Seeded Borrowers
+| Borrower ID | Name | Email |
+| :--- | :--- | :--- |
+| `11111111-1111-1111-1111-111111111111` | Alice Tan | `alice.tan@example.com` |
+| `22222222-2222-2222-2222-222222222222` | Bob Lim | `bob.lim@example.com` |
+| `33333333-3333-3333-3333-333333333333` | Charlie Wong | `charlie.wong@example.com` |
+
+#### Pre-Seeded Book Copies
+| Book ID | ISBN | Title | Author | Borrowed? | Borrowed By |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| `aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa1` | `978-0-13-235088-4` | Clean Code | Robert C. Martin | `false` (Available) | — |
+| `aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa2` | `978-0-13-235088-4` | Clean Code | Robert C. Martin | `true` (Borrowed) | Alice Tan (`11111111-...`) |
+| `bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbb1` | `978-1-4493-7332-0` | Designing Data-Intensive Applications | Martin Kleppmann | `false` (Available) | — |
+| `bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbb2` | `978-1-4493-7332-0` | Designing Data-Intensive Applications | Martin Kleppmann | `false` (Available) | — |
+| `cccccccc-cccc-cccc-cccc-ccccccccccc1` | `978-0-13-468599-1` | Effective Java | Joshua Bloch | `false` (Available) | — |
+
+#### Quick Instant Test Commands (Using Pre-Seeded IDs)
+```bash
+# 1. List all pre-seeded books
+curl -X GET http://localhost:8080/api/v1/books
+
+# 2. Borrow Available Copy 1 of Clean Code on behalf of Bob Lim -> 200 OK
+curl -X POST http://localhost:8080/api/v1/borrowers/22222222-2222-2222-2222-222222222222/books/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa1/borrow
+
+# 3. Try borrowing Already-Borrowed Copy 2 of Clean Code on behalf of Charlie Wong -> 409 Conflict
+curl -X POST http://localhost:8080/api/v1/borrowers/33333333-3333-3333-3333-333333333333/books/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa2/borrow
+
+# 4. Return Copy 2 of Clean Code on behalf of Alice Tan -> 200 OK
+curl -X POST http://localhost:8080/api/v1/borrowers/11111111-1111-1111-1111-111111111111/books/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa2/return
+```
+
 ---
 
 ## 7. API Documentation
