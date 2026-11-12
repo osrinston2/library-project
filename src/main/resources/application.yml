@@ -2,9 +2,9 @@ spring:
   application:
     name: library-management-api
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/library_db}
-    username: ${SPRING_DATASOURCE_USERNAME:library_user}
-    password: ${SPRING_DATASOURCE_PASSWORD:library_pass}
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/library_db?sslmode=disable}
+    username: ${SPRING_DATASOURCE_USERNAME:root}
+    password: ${SPRING_DATASOURCE_PASSWORD:postgres123}
     driver-class-name: ${SPRING_DATASOURCE_DRIVER:org.postgresql.Driver}
     hikari:
       maximum-pool-size: ${DB_POOL_MAX_SIZE:10}
@@ -27,7 +27,7 @@ spring:
     timeout-per-shutdown-phase: 20s
 
 server:
-  port: ${SERVER_PORT:8080}
+  port: ${SERVER_PORT:8081}
   shutdown: graceful
   error:
     include-message: always
