@@ -29,10 +29,10 @@ COPY --from=builder /workspace/target/*.jar /app/app.jar
 RUN chown -R library:library /app
 USER library
 
-EXPOSE 8080
+EXPOSE 8081
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
-  CMD curl -f http://localhost:${SERVER_PORT:-8080}/actuator/health || exit 1
+  CMD curl -f http://localhost:${SERVER_PORT:-8081}/actuator/health || exit 1
 
 ENTRYPOINT ["java", "-XX:+UseContainerSupport", "-XX:MaxRAMPercentage=75.0", "-jar", "/app/app.jar"]
 
