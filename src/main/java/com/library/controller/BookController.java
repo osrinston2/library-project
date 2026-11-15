@@ -34,7 +34,7 @@ public class BookController {
     @PostMapping
     @Operation(
             summary = "Register a new book copy",
-            description = "Registers a new physical book copy. Multiple copies with the same ISBN are allowed and receive distinct IDs, provided their title and author match existing copies of that ISBN."
+            description = "Registers a new book copy. Multiple copies with the same ISBN are allowed and receive distinct IDs, provided their title and author match existing copies of that ISBN."
     )
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "Book copy registered successfully"),
@@ -50,7 +50,7 @@ public class BookController {
     @GetMapping
     @Operation(
             summary = "Get all books in the library",
-            description = "Retrieves a list of all registered physical book copies and their current availability."
+            description = "Retrieves a list of registered book copies and their current availability."
     )
     @ApiResponse(responseCode = "200", description = "List of books retrieved successfully")
     public ResponseEntity<List<BookResponse>> getAllBooks() {
@@ -60,7 +60,7 @@ public class BookController {
     @GetMapping("/{bookId}")
     @Operation(
             summary = "Get a book copy by ID",
-            description = "Retrieves details of a specific physical book copy by its unique ID."
+            description = "Retrieves details of a specific book copy by its unique ID."
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Book copy retrieved successfully"),

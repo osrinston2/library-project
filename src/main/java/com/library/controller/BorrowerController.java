@@ -36,7 +36,7 @@ public class BorrowerController {
     }
 
     @PostMapping
-    @Operation(summary = "Register a new borrower", description = "Registers a new library borrower with a unique email address.")
+    @Operation(summary = "Register a new borrower", description = "Registers new borrower with a unique email address.")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "Borrower registered successfully"),
             @ApiResponse(responseCode = "400", description = "Invalid request payload"),
@@ -68,7 +68,7 @@ public class BorrowerController {
     @PostMapping("/{borrowerId}/books/{bookId}/borrow")
     @Operation(
             summary = "Borrow a book on behalf of a borrower",
-            description = "Checks out a specific physical book copy (by bookId) for the specified borrower. Ensures only one member can borrow a book copy at a time."
+            description = "Checks out a specific book copy (by bookId) for the specified borrower. Only one member can borrow a book copy at a time."
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Book borrowed successfully"),
