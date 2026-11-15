@@ -1,6 +1,6 @@
 # Library Management System RESTful API
 
-A clean, production-ready RESTful API built with **Java 17** and **Spring Boot 3** to manage a library catalog, borrowers, and book loans.
+A RESTful API built with **Java 17** and **Spring Boot Framework** to manage a library catalog, borrowers, and book loans.
 
 ---
 
@@ -25,7 +25,7 @@ A clean, production-ready RESTful API built with **Java 17** and **Spring Boot 3
 - **List all books** (`GET /api/v1/books`) with real-time availability status and current holder reference.
 - **Borrow a book copy on behalf of a borrower** (`POST /api/v1/borrowers/{borrowerId}/books/{bookId}/borrow`) protected by JPA `@Version` optimistic locking to guarantee no two borrowers can check out the same `bookId` simultaneously.
 - **Return a borrowed book** (`POST /api/v1/borrowers/{borrowerId}/books/{bookId}/return`) recording return timestamps in the loan audit history.
-- **Interactive OpenAPI / Swagger UI** available out of the box at `/swagger-ui.html`.
+- **Interactive OpenAPI / Swagger UI** available out of the box at `/swagger-ui/index.html`.
 
 ### Layered Architecture
 
@@ -44,7 +44,7 @@ src/main/java/com/library
 
 ## 2. Database Choice & Justification
 
-### Primary Database: **PostgreSQL 16** (with **H2** in PostgreSQL-compatibility mode for zero-dependency local/test runs)
+### Primary Database: **PostgreSQL 16**
 
 #### Why Relational (RDBMS) over NoSQL?
 1. **Strict ACID Transactions for Borrowing Concurrency**:
@@ -149,9 +149,9 @@ To address any requirements not explicitly specified in the problem statement, t
 ```bash
 docker compose up --build
 ```
-- The API will be available at `http://localhost:8080`
-- Swagger UI will be available at `http://localhost:8080/swagger-ui.html`
-- Health check endpoint: `http://localhost:8080/actuator/health`
+- The API will be available at `http://localhost:8081`
+- Swagger UI will be available at `http://localhost:8081/swagger-ui.html`
+- Health check endpoint: `http://localhost:8081/actuator/health`
 
 ### Option B: Run Locally with H2 In-Memory Profile (Zero External Setup)
 
@@ -159,13 +159,26 @@ docker compose up --build
 # Linux / macOS
 ./mvnw spring-boot:run -Dspring-boot.run.profiles=local
 
-# Windows PowerShell / CMD
-.\mvnw.cmd spring-boot:run -Dspring-boot.run.profiles=local
+# Windows PowerShell (quote -D arguments containing dots, or use -Plocal)
+.\mvnw.cmd spring-boot:run -Plocal
+# or:
+.\mvnw.cmd spring-boot:run "-Dspring-boot.run.profiles=local"
 ```
 
 ### Option C: Run Locally against PostgreSQL
 
+*(Requires a running PostgreSQL instance on `localhost:5432`, e.g., started via `docker compose up -d postgres`)*
+
+```powershell
+# Windows PowerShell
+$env:SPRING_DATASOURCE_URL="jdbc:postgresql://localhost:5432/library_db"
+$env:SPRING_DATASOURCE_USERNAME="library_user"
+$env:SPRING_DATASOURCE_PASSWORD="library_pass"
+.\mvnw.cmd spring-boot:run
+```
+
 ```bash
+# Linux / macOS (Bash / Zsh)
 export SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/library_db
 export SPRING_DATASOURCE_USERNAME=library_user
 export SPRING_DATASOURCE_PASSWORD=library_pass
@@ -193,18 +206,19 @@ On startup, Flyway automatically seeds the database with sample borrowers, books
 | `cccccccc-cccc-cccc-cccc-ccccccccccc1` | `978-0-13-468599-1` | Effective Java | Joshua Bloch | `false` (Available) | — |
 
 #### Quick Instant Test Commands (Using Pre-Seeded IDs)
-```bash
+*(Note: On Windows PowerShell, use `curl.exe` instead of `curl` so PowerShell calls the real cURL binary rather than its `Invoke-WebRequest` alias.)*
+```powershell
 # 1. List all pre-seeded books
-curl -X GET http://localhost:8080/api/v1/books
+curl.exe -X GET http://localhost:8081/api/v1/books
 
 # 2. Borrow Available Copy 1 of Clean Code on behalf of Bob Lim -> 200 OK
-curl -X POST http://localhost:8080/api/v1/borrowers/22222222-2222-2222-2222-222222222222/books/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa1/borrow
+curl.exe -X POST http://localhost:8081/api/v1/borrowers/22222222-2222-2222-2222-222222222222/books/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa1/borrow
 
 # 3. Try borrowing Already-Borrowed Copy 2 of Clean Code on behalf of Charlie Wong -> 409 Conflict
-curl -X POST http://localhost:8080/api/v1/borrowers/33333333-3333-3333-3333-333333333333/books/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa2/borrow
+curl.exe -X POST http://localhost:8081/api/v1/borrowers/33333333-3333-3333-3333-333333333333/books/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa2/borrow
 
 # 4. Return Copy 2 of Clean Code on behalf of Alice Tan -> 200 OK
-curl -X POST http://localhost:8080/api/v1/borrowers/11111111-1111-1111-1111-111111111111/books/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa2/return
+curl.exe -X POST http://localhost:8081/api/v1/borrowers/11111111-1111-1111-1111-111111111111/books/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa2/return
 ```
 
 ---
@@ -212,8 +226,8 @@ curl -X POST http://localhost:8080/api/v1/borrowers/11111111-1111-1111-1111-1111
 ## 7. API Documentation
 
 Once the server is running, interactive OpenAPI documentation is available at:
-- **Swagger UI**: `http://localhost:8080/swagger-ui.html`
-- **OpenAPI JSON Spec**: `http://localhost:8080/api-docs`
+- **Swagger UI**: `http://localhost:8081/swagger-ui.html`
+- **OpenAPI JSON Spec**: `http://localhost:8081/api-docs`
 
 ### Summary of Endpoints
 
@@ -237,7 +251,7 @@ Once the server is running, interactive OpenAPI documentation is available at:
 - **Endpoint**: `POST /api/v1/borrowers`
 - **Request Body**:
 ```bash
-curl -X POST http://localhost:8080/api/v1/borrowers \
+curl -X POST http://localhost:8081/api/v1/borrowers \
   -H "Content-Type: application/json" \
   -d '{
     "name": "Alice Tan",
@@ -258,7 +272,7 @@ curl -X POST http://localhost:8080/api/v1/borrowers \
 - **Endpoint**: `POST /api/v1/books`
 - **Request Body**:
 ```bash
-curl -X POST http://localhost:8080/api/v1/books \
+curl -X POST http://localhost:8081/api/v1/books \
   -H "Content-Type: application/json" \
   -d '{
     "isbn": "978-0-13-235088-4",
@@ -282,7 +296,7 @@ curl -X POST http://localhost:8080/api/v1/books \
 #### 3. Get a List of All Books in the Library
 - **Endpoint**: `GET /api/v1/books`
 ```bash
-curl -X GET http://localhost:8080/api/v1/books
+curl -X GET http://localhost:8081/api/v1/books
 ```
 - **Response (`200 OK`)**:
 ```json
@@ -302,7 +316,7 @@ curl -X GET http://localhost:8080/api/v1/books
 #### 4. Borrow a Book on Behalf of a Borrower
 - **Endpoint**: `POST /api/v1/borrowers/{borrowerId}/books/{bookId}/borrow`
 ```bash
-curl -X POST http://localhost:8080/api/v1/borrowers/550e8400-e29b-41d4-a716-446655440000/books/7f8b9c1a-2d3e-4f5a-8b9c-0d1e2f3a4b5c/borrow
+curl -X POST http://localhost:8081/api/v1/borrowers/550e8400-e29b-41d4-a716-446655440000/books/7f8b9c1a-2d3e-4f5a-8b9c-0d1e2f3a4b5c/borrow
 ```
 - **Response (`200 OK`)**:
 ```json
@@ -322,7 +336,7 @@ curl -X POST http://localhost:8080/api/v1/borrowers/550e8400-e29b-41d4-a716-4466
 #### 5. Return a Borrowed Book on Behalf of a Borrower
 - **Endpoint**: `POST /api/v1/borrowers/{borrowerId}/books/{bookId}/return`
 ```bash
-curl -X POST http://localhost:8080/api/v1/borrowers/550e8400-e29b-41d4-a716-446655440000/books/7f8b9c1a-2d3e-4f5a-8b9c-0d1e2f3a4b5c/return
+curl -X POST http://localhost:8081/api/v1/borrowers/550e8400-e29b-41d4-a716-446655440000/books/7f8b9c1a-2d3e-4f5a-8b9c-0d1e2f3a4b5c/return
 ```
 - **Response (`200 OK`)**:
 ```json

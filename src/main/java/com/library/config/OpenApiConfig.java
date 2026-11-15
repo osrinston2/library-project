@@ -15,10 +15,7 @@ public class OpenApiConfig {
                 .info(new Info()
                         .title("Library Management System API")
                         .description("RESTful API for registering borrowers and books, listing catalog copies, and managing book loans.")
-                        .version("1.0.0")
-                        .contact(new Contact()
-                                .name("Library Engineering Team")
-                                .email("support@library.example.com")));
+                        .version("1.0.0"));
     }
 }
 
